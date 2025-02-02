@@ -7,16 +7,10 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * The entry point of the Spring Boot application.
- *
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
- *
- */
-@SpringBootApplication
+//@SpringBootApplication
 @NpmPackage(value = "@fontsource/chewy", version = "4.5.0")
 @Theme(value = "my-game", variant = Lumo.DARK)
+@SpringBootApplication
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
