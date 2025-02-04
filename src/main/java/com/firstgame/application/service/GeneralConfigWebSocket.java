@@ -22,7 +22,7 @@ public class GeneralConfigWebSocket {
     private static String currentPlayer = "X";
 
     @OnOpen
-    public void onOpen(Session session) {
+    public void onOpen(Session session){
         sessions.add(session);
         try {
             ObjectNode response = mapper.createObjectNode();
@@ -40,9 +40,6 @@ public class GeneralConfigWebSocket {
         String type = jsonNode.get("type").asText();
 
         if ("game".equals(type)) {
-//            int row = jsonNode.get("row").asInt();
-//            int col = jsonNode.get("col").asInt();
-//            String player = jsonNode.get("player").asText();
             String nextPlayer = jsonNode.get("nextPlayer").asText();
 
             // Spielnachricht an alle senden
@@ -58,6 +55,11 @@ public class GeneralConfigWebSocket {
             response.put("currentPlayer", currentPlayer);
             session.getBasicRemote().sendText(response.toString());
         }
+        else if ("reset".equals(type)) {
+            currentPlayer = "X";
+            broadcastMessage(message);
+            System.out.println(jsonNode.get("type").asText());
+        }
     }
 
     @OnClose
@@ -66,7 +68,6 @@ public class GeneralConfigWebSocket {
     }
 
     private void broadcastMessage(String message) {
-        // Перебираємо всі відкриті сесії і відправляємо кожній
         for (Session session : sessions) {
             try {
                 if (session.isOpen()) {

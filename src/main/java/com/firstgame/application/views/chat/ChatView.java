@@ -17,7 +17,7 @@ public class ChatView extends VerticalLayout {
 
     public ChatView() {
         chatArea.setWidth("100%");
-        chatArea.setHeight("400px");
+        chatArea.setHeight("500px");
         chatArea.getStyle().set("padding", "10px")
                         .set("border", "1px solid #ccc")
                                 .set("background-color", "#f9f9f9")
@@ -37,7 +37,6 @@ public class ChatView extends VerticalLayout {
         add(chatArea, textField, sendBtn);
 
         webSocketManager.setupWebSocketChat();
-//        setupWebSocketGame();
     }
 
     public void sendMessage() {
@@ -47,30 +46,4 @@ public class ChatView extends VerticalLayout {
             textField.clear();
         }
     }
-
-//    public void setupWebSocketGame() {
-//        getElement().executeJs(
-//                "let socketUrl = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/chat';" +
-//                        "var socket = new WebSocket(socketUrl);" +
-//                        "socket.onmessage = function(event) {" +
-//                        "  let data = JSON.parse(event.data);" +
-//                        "  if (data.type === 'chat') {" +
-//                        "    var msgDiv = document.createElement('div');" +
-//                        "    msgDiv.textContent = data.text;" +
-//                        "    msgDiv.style.wordWrap = 'break-word';" +
-//                        "    msgDiv.style.overflowWrap = 'break-word';" +
-//                        "    msgDiv.style.whiteSpace = 'pre-wrap';" +
-//                        "    msgDiv.style.maxWidth = '100%';" +
-//                        "    msgDiv.style.padding = '5px';" +
-//                        "    msgDiv.style.borderRadius = '5px';" +
-//                        "    msgDiv.style.backgroundColor = '#e0e0e0';" +
-//                        "    msgDiv.style.marginBottom = '5px';" +
-//                        "    $0.appendChild(msgDiv);" +
-//                        "    $0.scrollTop = $0.scrollHeight;" + // Scrollt automatisch nach unten
-//                        "  }" +
-//                        "};" +
-//                        "window.sendMessage = function(msg) { socket.send(msg); };",
-//                chatArea.getElement()
-//        );
-//    }
 }

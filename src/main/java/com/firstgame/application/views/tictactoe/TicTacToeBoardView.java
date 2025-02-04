@@ -12,21 +12,25 @@ public class TicTacToeBoardView extends VerticalLayout {
     private final Button[][] buttons;
     private final String[][] board = new String[3][3];
     private String currentPlayer; // Startspieler wird aus WebSocket gesetzt
+    public Button resetButton;
 
     public TicTacToeBoardView() {
         gameBoard = new Div();
         buttons = new Button[3][3];
+        resetButton = new Button("Reset");
+        resetButton.setEnabled(false);
+        resetButton.setId("resetButton");
 
         setupGameBoard();
-        add(gameBoard);
+        add(gameBoard, resetButton);
 
         // WebSocket-Manager erstellen und einrichten
         WebSocketsManager webSocketManager = new WebSocketsManager(gameBoard.getElement());
         webSocketManager.setupWebSocketGame();
-
     }
 
     private void setupGameBoard() {
+        gameBoard.setId("gameBoard");
         gameBoard.getStyle()
                 .set("display", "grid")
                 .set("grid-template-columns", "repeat(3, 100px)")
@@ -63,22 +67,25 @@ public class TicTacToeBoardView extends VerticalLayout {
         getElement().executeJs("return window.currentPlayer || 'X';").then(player -> {
             currentPlayer = player.asString();
             System.out.println("Aktueller Spieler: " + currentPlayer);
-
+            System.out.println("board " + board[row][col]);
 
             if (board[row][col] == null) {
                 board[row][col] = currentPlayer;
                 buttons[row][col].setText(currentPlayer);
 
+                int[][] winner = TicTacToeGameProcess.checkWinner(board);
+
                 String nextPlayer = currentPlayer.equals("X") ? "O" : "X";
                 getElement().executeJs(
-                        "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3}))",
-                        row, col, currentPlayer, nextPlayer
+                        "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
+                        row, col, currentPlayer, nextPlayer, null, null
                 );
 
-                int[][] winner = TicTacToeGameProcess.checkWinner(board);
                 if (winner != null) {
                     highlightWinner(winner);
                     Notification.show("Spieler " + currentPlayer + " hat gewonnen!");
+                    resetButton.setEnabled(true);
+                    resetButton.addClickListener(e -> resetBoard());
                 } else {
                     currentPlayer = nextPlayer;
                 }
@@ -89,8 +96,28 @@ public class TicTacToeBoardView extends VerticalLayout {
     }
 
     private void highlightWinner(int[][] winner) {
+        int winnerRow;
+        int winnerCol;
         for (int[] pos : winner) {
+            winnerRow = pos[0];
+            winnerCol = pos[1];
             buttons[pos[0]][pos[1]].getStyle().set("background-color", "#90EE90");
+            getElement().executeJs(
+                    "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
+                    winnerRow, winnerCol, currentPlayer, null, winnerRow, winnerCol
+            );
         }
+    }
+
+    private void resetBoard() {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                buttons[row][col].setText("");
+                board[row][col] = null;
+                buttons[row][col].getStyle().set("background-color", "inherit");
+            }
+        }
+        getElement().executeJs("window.sendMessage(JSON.stringify({type: 'reset'}))");
+        resetButton.setEnabled(false);
     }
 }

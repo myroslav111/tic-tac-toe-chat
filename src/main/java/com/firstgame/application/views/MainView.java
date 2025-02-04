@@ -37,7 +37,7 @@ public class MainView extends Composite<VerticalLayout> {
         layoutColumn2.setJustifyContentMode(JustifyContentMode.CENTER);
         layoutColumn2.setAlignItems(Alignment.CENTER);
 
-        layoutColumn3.setWidth("496px");
+        layoutColumn3.setWidth("596px");
         layoutColumn3.setHeight("95%");
         layoutColumn3.getStyle().set("flex-grow", "1");
         layoutColumn3.setJustifyContentMode(JustifyContentMode.END);
