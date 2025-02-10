@@ -2,11 +2,13 @@ package com.firstgame.application.service;
 
 import com.vaadin.flow.dom.Element;
 
-
+// verwaltet WebSockets für ein Tic-Tac-Toe-Spiel und einen Chat.
 public class WebSocketsManager {
+//    HTML-DOM-Elemente repräsentiert
     private final Element domElement;
 
     public WebSocketsManager(Element domElement) {
+//        Der Konstruktor speichert das übergebene DOM-Element.
         this.domElement = domElement;
     }
 
@@ -88,8 +90,6 @@ public class WebSocketsManager {
                         "   console.log('resetButton->' + resetButton.tagName);" +
                         "   console.log(document.getElementById('gameBoard')); " +
                         "};"
-                ,
-                domElement
         );
 
         domElement.executeJs("window.getCurrentPlayer();").then(player -> {
@@ -107,7 +107,7 @@ public class WebSocketsManager {
                         "socket.onmessage = function(event) {" +
                         "  let data = JSON.parse(event.data);" +
                         "  if (data.type === 'chat') {" +
-                        "    var msgDiv = document.createElement('div');" +
+                        "    const msgDiv = document.createElement('div');" +
                         "    msgDiv.textContent = data.text;" +
                         "    msgDiv.style.wordWrap = 'break-word';" +
                         "    msgDiv.style.overflowWrap = 'break-word';" +
@@ -126,3 +126,39 @@ public class WebSocketsManager {
         );
     }
 }
+
+//import com.vaadin.flow.component.AttachEvent;
+//import com.vaadin.flow.component.DetachEvent;
+//import com.vaadin.flow.component.UI;
+//import com.vaadin.flow.component.html.Div;
+//import com.vaadin.flow.shared.Registration;
+//import com.vaadin.flow.component.dependency.JsModule;
+//
+//@JsModule("./websocket.js") // Lädt die JavaScript-Datei
+//public class WebSocketsManager extends Div {
+//    private Registration uiRegistration;
+//
+//    public WebSocketsManager() {
+//        setId("websocket-container");
+//    }
+//
+//    @Override
+//    protected void onAttach(AttachEvent attachEvent) {
+//        UI ui = attachEvent.getUI();
+//        uiRegistration = ui.getPage().executeJs("setupWebSocketGame(window.updateGame, window.resetGame);").execute();
+//    }
+//
+//    @Override
+//    protected void onDetach(DetachEvent detachEvent) {
+//        if (uiRegistration != null) {
+//            uiRegistration.remove();
+//            uiRegistration = null;
+//        }
+//    }
+//
+//    public void setupWebSocketChat() {
+//        getElement().executeJs("setupWebSocketChat($0);", getElement());
+//    }
+//}
+
+

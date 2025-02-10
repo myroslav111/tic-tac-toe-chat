@@ -10,12 +10,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 public class TicTacToeBoardView extends VerticalLayout {
     private final Div gameBoard;
     private final Button[][] buttons;
+//    Speichert die Spielzustände
     private final String[][] board = new String[3][3];
-    private String currentPlayer; // Startspieler wird aus WebSocket gesetzt
+    public String currentPlayer; // Startspieler wird aus WebSocket gesetzt
     public Button resetButton;
+    public short move = 1;
 
+//    UI
     public TicTacToeBoardView() {
         gameBoard = new Div();
+//        3×3-Array für die 9 Spielknöpfe
         buttons = new Button[3][3];
         resetButton = new Button("Reset");
         resetButton.setEnabled(false);
@@ -26,9 +30,11 @@ public class TicTacToeBoardView extends VerticalLayout {
 
         // WebSocket-Manager erstellen und einrichten
         WebSocketsManager webSocketManager = new WebSocketsManager(gameBoard.getElement());
+//        Startet die WebSocket-Kommunikation für Multiplayer-Funktionalität
         webSocketManager.setupWebSocketGame();
     }
 
+//    Spielfeld-Setup
     private void setupGameBoard() {
         gameBoard.setId("gameBoard");
         gameBoard.getStyle()
@@ -49,6 +55,7 @@ public class TicTacToeBoardView extends VerticalLayout {
     private Button createButton(int row, int col) {
         Button button = new Button("");
         button.setId("btn-" + row + "-" + col);
+        //    Gestaltung
         button.getStyle()
                 .set("width", "100%")
                 .set("height", "100%")
@@ -64,6 +71,9 @@ public class TicTacToeBoardView extends VerticalLayout {
     }
 
     private void handleMove(int row, int col) {
+        System.out.println(move);
+        move ++;
+//        Liest den aktuellen Spieler über JavaScript
         getElement().executeJs("return window.currentPlayer || 'X';").then(player -> {
             currentPlayer = player.asString();
             System.out.println("Aktueller Spieler: " + currentPlayer);
@@ -76,16 +86,24 @@ public class TicTacToeBoardView extends VerticalLayout {
                 int[][] winner = TicTacToeGameProcess.checkWinner(board);
 
                 String nextPlayer = currentPlayer.equals("X") ? "O" : "X";
+
+//                Sendet den Spielzug an den Server, damit der andere Spieler die Aktualisierung erhält.
                 getElement().executeJs(
                         "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
                         row, col, currentPlayer, nextPlayer, null, null
                 );
+
+                if (move == 10) {
+                    resetButton.setEnabled(true);
+                    resetButton.addClickListener(e -> resetBoard());
+                }
 
                 if (winner != null) {
                     highlightWinner(winner);
                     Notification.show("Spieler " + currentPlayer + " hat gewonnen!");
                     resetButton.setEnabled(true);
                     resetButton.addClickListener(e -> resetBoard());
+
                 } else {
                     currentPlayer = nextPlayer;
                 }
@@ -95,6 +113,7 @@ public class TicTacToeBoardView extends VerticalLayout {
         });
     }
 
+//    Gewinner markieren
     private void highlightWinner(int[][] winner) {
         int winnerRow;
         int winnerCol;
@@ -110,6 +129,7 @@ public class TicTacToeBoardView extends VerticalLayout {
     }
 
     private void resetBoard() {
+//        Setzt alle Felder auf leer.
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 buttons[row][col].setText("");
@@ -117,7 +137,10 @@ public class TicTacToeBoardView extends VerticalLayout {
                 buttons[row][col].getStyle().set("background-color", "inherit");
             }
         }
+//        Sendet ein Reset-Signal an WebSockets.
         getElement().executeJs("window.sendMessage(JSON.stringify({type: 'reset'}))");
         resetButton.setEnabled(false);
+        System.out.println(move);
+        move = 1;
     }
 }

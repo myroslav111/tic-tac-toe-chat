@@ -7,17 +7,18 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
 public class ChatView extends VerticalLayout {
-    public Div chatArea = new Div();
-    public TextField textField = new TextField();
-    public Button sendBtn = new Button("Send");
+    private Div chatArea = new Div();
+    private TextField textField = new TextField();
+    private Button sendBtn = new Button("Send");
 
     // WebSocket-Manager erstellen und einrichten
+//    WebSocketsManager webSocketManager = new WebSocketsManager(chatArea.getElement());
     WebSocketsManager webSocketManager = new WebSocketsManager(chatArea.getElement());
 
-
+//    Gestaltung
     public ChatView() {
         chatArea.setWidth("100%");
-        chatArea.setHeight("500px");
+        chatArea.setHeight("300px");
         chatArea.getStyle().set("padding", "10px")
                         .set("border", "1px solid #ccc")
                                 .set("background-color", "#f9f9f9")
@@ -36,6 +37,7 @@ public class ChatView extends VerticalLayout {
 
         add(chatArea, textField, sendBtn);
 
+//        WebSocket-Chatverbindung starten
         webSocketManager.setupWebSocketChat();
     }
 

@@ -26,8 +26,10 @@ public class MainView extends Composite<VerticalLayout> {
         chat = new ChatView();
 
         getContent().setWidth("100%");
+//        addClassName("main-view");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.addClassName(Gap.MEDIUM);
+//        layoutRow.addClassName("....");
         layoutRow.setWidth("100%");
         layoutRow.setHeight("100vh");
         layoutRow.getStyle().set("flex-grow", "1");
