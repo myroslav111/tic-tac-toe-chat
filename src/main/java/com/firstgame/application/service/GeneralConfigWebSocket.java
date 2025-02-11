@@ -80,6 +80,7 @@ public class GeneralConfigWebSocket {
     @OnClose
     public void onClose(Session session) {
         sessions.remove(session);
+        System.out.println("WebSocket geschlossen: " + session.getId());
     }
 
 //    Durchläuft alle aktiven Sessions und sendet die Nachricht weiter.

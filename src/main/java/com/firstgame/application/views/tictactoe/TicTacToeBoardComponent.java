@@ -7,18 +7,19 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class TicTacToeBoardView extends VerticalLayout {
-    private final Div gameBoard;
+public class TicTacToeBoardComponent extends VerticalLayout {
+//    private final Div gameBoard;
+    private final Div gameBoard = new Div();
     private final Button[][] buttons;
 //    Speichert die Spielzustände
     private final String[][] board = new String[3][3];
     public String currentPlayer; // Startspieler wird aus WebSocket gesetzt
     public Button resetButton;
     public short move = 1;
-
+    WebSocketsManager gameWebSocketManager = new WebSocketsManager(gameBoard.getElement());
 //    UI
-    public TicTacToeBoardView() {
-        gameBoard = new Div();
+    public TicTacToeBoardComponent() {
+//        gameBoard = new Div();
 //        3×3-Array für die 9 Spielknöpfe
         buttons = new Button[3][3];
         resetButton = new Button("Reset");
@@ -29,20 +30,15 @@ public class TicTacToeBoardView extends VerticalLayout {
         add(gameBoard, resetButton);
 
         // WebSocket-Manager erstellen und einrichten
-        WebSocketsManager webSocketManager = new WebSocketsManager(gameBoard.getElement());
+
 //        Startet die WebSocket-Kommunikation für Multiplayer-Funktionalität
-        webSocketManager.setupWebSocketGame();
+        gameWebSocketManager.setupWebSocketGame();
     }
 
 //    Spielfeld-Setup
     private void setupGameBoard() {
         gameBoard.setId("gameBoard");
-        gameBoard.getStyle()
-                .set("display", "grid")
-                .set("grid-template-columns", "repeat(3, 100px)")
-                .set("grid-template-rows", "repeat(3, 100px)")
-                .set("gap", "5px")
-                .set("justify-content", "center");
+        gameBoard.addClassName("game-board");
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
@@ -56,15 +52,7 @@ public class TicTacToeBoardView extends VerticalLayout {
         Button button = new Button("");
         button.setId("btn-" + row + "-" + col);
         //    Gestaltung
-        button.getStyle()
-                .set("width", "100%")
-                .set("height", "100%")
-                .set("font-size", "24px")
-                .set("text-align", "center")
-                .set("border", "2px solid black")
-                .set("border-color", "#f0f0f0")
-                .set("cursor", "pointer")
-                .set("border-radius", "10px");
+        button.addClassName("button-of-board");
 
         button.addClickListener(e -> handleMove(row, col));
         return button;
@@ -84,14 +72,21 @@ public class TicTacToeBoardView extends VerticalLayout {
                 buttons[row][col].setText(currentPlayer);
 
                 int[][] winner = TicTacToeGameProcess.checkWinner(board);
+                System.out.println("currentPlayer" + currentPlayer);
 
                 String nextPlayer = currentPlayer.equals("X") ? "O" : "X";
+
+                System.out.println("nextPlayer" + nextPlayer);
 
 //                Sendet den Spielzug an den Server, damit der andere Spieler die Aktualisierung erhält.
                 getElement().executeJs(
                         "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
                         row, col, currentPlayer, nextPlayer, null, null
                 );
+//                getElement().executeJs(
+//                        "window.TicTacToeWebSocket.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
+//                        row, col, currentPlayer, nextPlayer, null, null
+//                );
 
                 if (move == 10) {
                     resetButton.setEnabled(true);
@@ -106,6 +101,7 @@ public class TicTacToeBoardView extends VerticalLayout {
 
                 } else {
                     currentPlayer = nextPlayer;
+                    System.out.println("currentPlayer" + currentPlayer);
                 }
             } else {
                 Notification.show("Feld belegt oder du bist nicht an der Reihe!");
@@ -120,11 +116,15 @@ public class TicTacToeBoardView extends VerticalLayout {
         for (int[] pos : winner) {
             winnerRow = pos[0];
             winnerCol = pos[1];
-            buttons[pos[0]][pos[1]].getStyle().set("background-color", "#90EE90");
+            buttons[pos[0]][pos[1]].addClassName("button-highlight-winner");
             getElement().executeJs(
                     "window.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
                     winnerRow, winnerCol, currentPlayer, null, winnerRow, winnerCol
             );
+//            getElement().executeJs(
+//                    "window.TicTacToeWebSocket.sendMessage(JSON.stringify({type: 'game', row: $0, col: $1, player: $2, nextPlayer: $3, winnerRow: $4, winnerCol: $5}))",
+//                    winnerRow, winnerCol, currentPlayer, null, winnerRow, winnerCol
+//            );
         }
     }
 
@@ -134,11 +134,12 @@ public class TicTacToeBoardView extends VerticalLayout {
             for (int col = 0; col < 3; col++) {
                 buttons[row][col].setText("");
                 board[row][col] = null;
-                buttons[row][col].getStyle().set("background-color", "inherit");
+                buttons[row][col].addClassName("button-highlight-winner-remove");
             }
         }
 //        Sendet ein Reset-Signal an WebSockets.
         getElement().executeJs("window.sendMessage(JSON.stringify({type: 'reset'}))");
+//        getElement().executeJs("window.TicTacToeWebSocket.sendMessage(JSON.stringify({type: 'reset'}))");
         resetButton.setEnabled(false);
         System.out.println(move);
         move = 1;

@@ -1,52 +1,34 @@
 package com.firstgame.application.views;
 
-import com.firstgame.application.views.chat.ChatView;
-import com.firstgame.application.views.tictactoe.TicTacToeBoardView;
+import com.firstgame.application.views.chat.ChatComponent;
+import com.firstgame.application.views.tictactoe.TicTacToeBoardComponent;
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
 @PageTitle("My View")
 @Route("")
 public class MainView extends Composite<VerticalLayout> {
 
-    TicTacToeBoardView board;
-    ChatView chat;
+    TicTacToeBoardComponent board;
+    ChatComponent chat;
 
     public MainView() {
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         VerticalLayout layoutColumn3 = new VerticalLayout();
-        board = new TicTacToeBoardView();
-        chat = new ChatView();
+        board = new TicTacToeBoardComponent();
+        chat = new ChatComponent();
 
-        getContent().setWidth("100%");
-//        addClassName("main-view");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutRow.addClassName(Gap.MEDIUM);
-//        layoutRow.addClassName("....");
-        layoutRow.setWidth("100%");
-        layoutRow.setHeight("100vh");
-        layoutRow.getStyle().set("flex-grow", "1");
+        addClassName("main-view");
 
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        layoutColumn2.setJustifyContentMode(JustifyContentMode.CENTER);
-        layoutColumn2.setAlignItems(Alignment.CENTER);
+        layoutRow.addClassName("layout-row");
 
-        layoutColumn3.setWidth("596px");
-        layoutColumn3.setHeight("95%");
-        layoutColumn3.getStyle().set("flex-grow", "1");
-        layoutColumn3.setJustifyContentMode(JustifyContentMode.END);
-        layoutColumn3.setAlignItems(Alignment.END);
-        layoutColumn3.getStyle().set("border-radius", "5px");
-        layoutColumn3.getElement().getStyle().set("background-color", "#f5f5f5");
-        layoutColumn3.getElement().getStyle().set("color", "black");
+        layoutColumn2.addClassName("layout-column-2");
+
+        layoutColumn3.addClassName("layout-column-3");
 
         getContent().add(layoutRow);
         layoutRow.add(layoutColumn2);

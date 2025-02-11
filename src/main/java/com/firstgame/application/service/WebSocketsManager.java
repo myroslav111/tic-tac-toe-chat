@@ -1,15 +1,22 @@
 package com.firstgame.application.service;
 
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.dom.Element;
 
 // verwaltet WebSockets für ein Tic-Tac-Toe-Spiel und einen Chat.
+@JsModule("./websocket-game.js")
+@JsModule("./websocket-chat.js")
 public class WebSocketsManager {
-//    HTML-DOM-Elemente repräsentiert
+    //    HTML-DOM-Elemente repräsentiert
     private final Element domElement;
 
     public WebSocketsManager(Element domElement) {
 //        Der Konstruktor speichert das übergebene DOM-Element.
         this.domElement = domElement;
+    }
+
+    public void setupWebSocketChat() {
+        domElement.executeJs("window.ChatWebSocket.connect();");
     }
 
     public void setupWebSocketGame() {
@@ -71,11 +78,10 @@ public class WebSocketsManager {
                         "                btn.disabled = true;" +
                         "                btn.style.color = 'black';" +
                         "         })" +
-                        "   }; "   +
+                        "   }; " +
                         "  window.currentPlayer = nextPlayer;" +
                         "  console.log('winner:', winnerRow, winnerCol);" +
                         "};" +
-
                         "window.resetGame = function() {" +
                         "   let gameB = document.getElementById('gameBoard');" +
                         "   let buttonArr = gameB.querySelectorAll('vaadin-button[id^=btn-]'); " +
@@ -96,69 +102,8 @@ public class WebSocketsManager {
             System.out.println("Aktueller Spieler: " + player.asString());
         });
     }
-
-
-
-
-        public void setupWebSocketChat() {
-            domElement.executeJs(
-                "let socketUrl = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/chat';" +
-                        "var socket = new WebSocket(socketUrl);" +
-                        "socket.onmessage = function(event) {" +
-                        "  let data = JSON.parse(event.data);" +
-                        "  if (data.type === 'chat') {" +
-                        "    const msgDiv = document.createElement('div');" +
-                        "    msgDiv.textContent = data.text;" +
-                        "    msgDiv.style.wordWrap = 'break-word';" +
-                        "    msgDiv.style.overflowWrap = 'break-word';" +
-                        "    msgDiv.style.whiteSpace = 'pre-wrap';" +
-                        "    msgDiv.style.maxWidth = '100%';" +
-                        "    msgDiv.style.padding = '5px';" +
-                        "    msgDiv.style.borderRadius = '5px';" +
-                        "    msgDiv.style.backgroundColor = '#e0e0e0';" +
-                        "    msgDiv.style.marginBottom = '5px';" +
-                        "    $0.appendChild(msgDiv);" +
-                        "    $0.scrollTop = $0.scrollHeight;" + // Scrollt automatisch nach unten
-                        "  }" +
-                        "};" +
-                        "window.sendMessage = function(msg) { socket.send(msg); };",
-                    domElement
-        );
-    }
 }
 
-//import com.vaadin.flow.component.AttachEvent;
-//import com.vaadin.flow.component.DetachEvent;
-//import com.vaadin.flow.component.UI;
-//import com.vaadin.flow.component.html.Div;
-//import com.vaadin.flow.shared.Registration;
-//import com.vaadin.flow.component.dependency.JsModule;
-//
-//@JsModule("./websocket.js") // Lädt die JavaScript-Datei
-//public class WebSocketsManager extends Div {
-//    private Registration uiRegistration;
-//
-//    public WebSocketsManager() {
-//        setId("websocket-container");
-//    }
-//
-//    @Override
-//    protected void onAttach(AttachEvent attachEvent) {
-//        UI ui = attachEvent.getUI();
-//        uiRegistration = ui.getPage().executeJs("setupWebSocketGame(window.updateGame, window.resetGame);").execute();
-//    }
-//
-//    @Override
-//    protected void onDetach(DetachEvent detachEvent) {
-//        if (uiRegistration != null) {
-//            uiRegistration.remove();
-//            uiRegistration = null;
-//        }
-//    }
-//
-//    public void setupWebSocketChat() {
-//        getElement().executeJs("setupWebSocketChat($0);", getElement());
-//    }
-//}
+
 
 
